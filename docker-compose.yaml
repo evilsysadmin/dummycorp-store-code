@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Servicio del frontend
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"  # Mapeamos el puerto 80 del contenedor al 80 de la máquina local
+    networks:
+      - app-network
+    depends_on:
+      - backend  # Aseguramos que el backend esté disponible antes de iniciar el frontend
+
+  # Servicio del backend
+  backend:
+    build:
+      context: ./backend
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/dummycorp
+    ports:
+      - "3000:3000"  # El backend estará accesible en localhost:3000
+    depends_on:
+      - mongo  # Aseguramos que MongoDB esté disponible antes de iniciar el backend
+    networks:
+      - app-network
+
+  # Servicio de MongoDB
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"  # MongoDB estará disponible en localhost:27017
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local
