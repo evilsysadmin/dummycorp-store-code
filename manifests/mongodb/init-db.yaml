@@ -9,12 +9,12 @@ spec:
       restartPolicy: OnFailure
       initContainers:
         - name: wait-for-mongodb
-          image: mongo:6.0  # Misma imagen que MongoDB
+          image: mongo:6.0
           command:
             - "bash"
             - "-c"
             - |
-              until mongo --host mongodb --port 27017 -u admin -p password --eval "db.runCommand({ ping: 1 })"; do
+              until mongosh --host mongodb --port 27017 -u admin -p password --eval "db.runCommand({ ping: 1 })"; do
                 echo "Esperando a que MongoDB esté listo..."
                 sleep 5
               done
