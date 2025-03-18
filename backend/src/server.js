@@ -1,15 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const productosRouter = require('../routes/productos');  // Asegúrate de importar las rutas
+const productosRouter = require('../routes/productos'); // Importa las rutas
 
 const app = express();
 const port = 3000;
 
-// Conectar con MongoDB
-mongoose.connect('mongodb://mongo:27017/dummycorp', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Conectado a MongoDB'))
-  .catch(err => console.log('Error de conexión a MongoDB:', err));
+// Obtener la URI de MongoDB desde las variables de entorno
+const mongoUri = process.env.MONGO_URI || 'mongodb://mongo:27017/dummycorp';
+
+mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log(`Conectado a MongoDB en ${mongoUri}`))
+  .catch(err => console.error('Error de conexión a MongoDB:', err));
 
 // Usar CORS
 app.use(cors());
@@ -18,7 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 // Registrar la ruta de productos
-app.use('/api', productosRouter);  // Asegúrate de que esta línea esté registrada
+app.use('/api', productosRouter);
 
 app.listen(port, () => {
   console.log(`Servidor backend corriendo en http://localhost:${port}`);
