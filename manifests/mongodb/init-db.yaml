@@ -32,7 +32,7 @@ spec:
             - "-c"
             - |
               for i in {1..5}; do
-                if mongoimport --host mongodb --port 27017 --username admin --password password --authenticationDatabase admin --db admin --collection products --drop --jsonArray < /fixtures/products.json; then
+                if mongoimport --host mongodb --port 27017 --username admin --password password --authenticationDatabase admin --db mydb --collection products --drop --jsonArray < /fixtures/products.json; then
                   echo "Importación completada con éxito!"
                   exit 0
                 fi
