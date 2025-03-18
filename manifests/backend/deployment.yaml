@@ -18,6 +18,9 @@ spec:
         image: 980921756231.dkr.ecr.eu-west-1.amazonaws.com/dummycorp-store-backend:latest
         ports:
         - containerPort: 3000
+        env:
+        - name: MONGO_URI
+          value: "mongodb://admin:password@mongodb:27017/mydb"
         resources:
           requests:
             cpu: "100m"
