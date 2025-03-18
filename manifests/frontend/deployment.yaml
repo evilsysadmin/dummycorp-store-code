@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: 980921756231.dkr.ecr.eu-west-1.amazonaws.com/store-frontend:latest
+        image: 980921756231.dkr.ecr.eu-west-1.amazonaws.com/dummycorp-store-frontend:latest
         ports:
         - containerPort: 80
         resources:
