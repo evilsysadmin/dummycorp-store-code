@@ -28,6 +28,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: store-frontend-service
+            name: dummycorp-store-frontend-service
             port:
               number: 80
