@@ -31,15 +31,19 @@ spec:
             - "bash"
             - "-c"
             - |
-              mongoimport --host mongodb --port 27017 --username admin --password password --db mydb --collection products --drop --jsonArray < /fixtures/products.json
+              for i in {1..5}; do
+                if mongoimport --host mongodb --port 27017 --username admin --password password --authenticationDatabase admin --db admin --collection products --drop --jsonArray < /fixtures/products.json; then
+                  echo "Importación completada con éxito!"
+                  exit 0
+                fi
+                echo "Fallo al importar, reintentando... (intento $i/5)"
+                sleep 5
+              done
+              echo "Error: No se pudo importar después de 5 intentos"
+              exit 1
           volumeMounts:
             - name: fixtures
               mountPath: /fixtures
-          env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              value: "admin"
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              value: "password"
       volumes:
         - name: fixtures
           configMap:
