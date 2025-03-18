@@ -4,6 +4,8 @@ metadata:
   name: dummycorp-store-frontend
   namespace: dummycorp-store
   annotations:
+    meta.helm.sh/release-name: argocd-apps
+    meta.helm.sh/release-namespace: argocd
     argocd-image-updater.argoproj.io/image-list: backend=980921756231.dkr.ecr.eu-west-1.amazonaws.com/dummycorp-store-frontend
     argocd-image-updater.argoproj.io/backend.update-strategy: latest
 spec:
