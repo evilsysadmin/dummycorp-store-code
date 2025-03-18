@@ -14,10 +14,16 @@ spec:
             - "bash"
             - "-c"
             - |
-              until mongosh --host mongodb --port 27017 -u admin -p password --eval "db.runCommand({ ping: 1 })"; do
-                echo "Esperando a que MongoDB esté listo..."
-                sleep 5
+              for i in {1..30}; do
+                if mongosh --host mongodb --port 27017 -u admin -p password --eval "db.runCommand({ ping: 1 })"; then
+                  echo "MongoDB está listo!"
+                  exit 0
+                fi
+                echo "Esperando a que MongoDB esté listo... (intento $i/30)"
+                sleep 10
               done
+              echo "Error: MongoDB no estuvo listo después de 5 minutos"
+              exit 1
       containers:
         - name: mongodb-init
           image: mongo:6.0
@@ -25,7 +31,7 @@ spec:
             - "bash"
             - "-c"
             - |
-              mongoimport --host mongodb --port 27017 --db mydb --collection products --drop --jsonArray < /fixtures/products.json
+              mongoimport --host mongodb --port 27017 --username admin --password password --db mydb --collection products --drop --jsonArray < /fixtures/products.json
           volumeMounts:
             - name: fixtures
               mountPath: /fixtures
@@ -39,4 +45,3 @@ spec:
           configMap:
             name: mongodb-fixtures
   backoffLimit: 4
-  
