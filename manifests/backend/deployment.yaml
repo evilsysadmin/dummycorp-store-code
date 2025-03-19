@@ -20,7 +20,7 @@ spec:
         - containerPort: 3000
         env:
         - name: MONGO_URI
-          value: "mongodb://admin:password@mongodb:27017/mydb"
+          value: "mongodb://admin:password@mongodb:27017/mydb?authSource=admin"
         resources:
           requests:
             cpu: "100m"
