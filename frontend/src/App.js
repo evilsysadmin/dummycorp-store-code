@@ -13,13 +13,14 @@ function App() {
   const [busqueda, setBusqueda] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/productos') 
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000/api'; // Fallback para desarrollo local
+    axios.get(`${apiUrl}/productos`)
       .then((response) => {
         const productosConId = response.data.map((producto) => ({
           id: producto._id,
-          nombre: producto.nombre,
-          descripcion: producto.descripcion,
-          precio: parseFloat(producto.precio),
+          nombre: producto.name,       // Cambiar a 'name' para coincidir con los datos del backend
+          descripcion: producto.description, // Cambiar a 'description'
+          precio: parseFloat(producto.price), // Cambiar a 'price'
           imagen: producto.imagen ? `/images/${producto.imagen}` : '/images/lart-image.jpg',
         }));
         setProductos(productosConId);
