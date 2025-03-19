@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dummycorp-store-frontend
+  namespace: dummycorp-store
+  annotations:
+    meta.helm.sh/release-name: argocd-apps
+    meta.helm.sh/release-namespace: argocd
+    argocd-image-updater.argoproj.io/image-list: frontend=980921756231.dkr.ecr.eu-west-1.amazonaws.com/dummycorp-store-frontend
+    argocd-image-updater.argoproj.io/backend.update-strategy: latest
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dummycorp-store-frontend
+  template:
+    metadata:
+      labels:
+        app: dummycorp-store-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: 980921756231.dkr.ecr.eu-west-1.amazonaws.com/dummycorp-store-frontend:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: REACT_APP_API_URL
+          value: "http://dummycorp-store-backend-service:80/api"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

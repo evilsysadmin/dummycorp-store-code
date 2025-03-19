@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-fixtures
+  namespace: dummycorp-store
+data:
+  products.json: |
+    [
+      {"name": "LART de BOFH", "description": "La Herramienta de Ajuste de Actitud del Bastard Operator From Hell. Perfecta para 'educar' a usuarios que preguntan '¿has probado reiniciar?'. Incluye garantía de 0 días.", "price": 42.99, "stock": 13},
+      {"name": "VW Polo Reventado Nostálgico", "description": "Un clásico destrozado de los 90, con más óxido que chapa. Ideal para hipsters que quieren un 'proyecto' o para presumir de 'vibes retro' en el garaje. No incluye motor.", "price": 199.95, "stock": 3},
+      {"name": "IA Humorística DignityTrader", "description": "Una inteligencia artificial que te cuenta chistes malos a cambio de pequeños fragmentos de tu dignidad. Ejemplo: '¿Por qué el programador murió? Porque el código no tenía comentarios'. Activación por voz incluida.", "price": 29.99, "stock": 50},
+      {"name": "Manual de Excusas para Developers", "description": "300 páginas de oro puro: 'Funciona en mi máquina', 'Eso es un feature, no un bug', y 'Lo arreglo en el próximo sprint'. Edición de tapa dura, con marcador de 'No me mires así'.", "price": 15.50, "stock": 200},
+      {"name": "Cafetera Overclockeada", "description": "Prepara café a 4 GHz. Incluye un ventilador RGB y un botón de 'turbo boost' para esos días de deadlines. Advertencia: puede explotar si la overclockeas demasiado.", "price": 89.90, "stock": 25},
+      {"name": "Camiseta '404: Vida no encontrada'", "description": "Para esos días en que tu existencia es un error HTTP. 100% algodón, disponible en negro (porque el blanco es para amateurs).", "price": 12.99, "stock": 150},
+      {"name": "Disquete de 3.5'' con DOOM", "description": "El clásico DOOM original, en un disquete real. Solo para coleccionistas o para impresionar a tus amigos hipsters. Lector no incluido (¡suerte encontrando uno!).", "price": 9.95, "stock": 30},
+      {"name": "Router Maldito de 56k", "description": "Revive los gloriosos días de los pitidos y zumbidos del dial-up. Perfecto para sesiones nostálgicas o para torturar a tus compañeros de piso. Velocidad máxima: 56 kbps.", "price": 24.50, "stock": 10},
+      {"name": "Gafas de Realidad Aumentada 'BugVision'", "description": "Te muestra bugs en el código antes de que los compiles… o al menos eso dice el manual. Realmente solo parpadea en rojo cuando te equivocas. Batería no incluida.", "price": 59.99, "stock": 40},
+      {"name": "Kit de Supervivencia Sysadmin", "description": "Incluye: cinta aislante, un pendrive con Ubuntu, café instantáneo, y una nota que dice 'RTFM'. Ideal para outages a medianoche o reuniones con el jefe.", "price": 34.75, "stock": 75}
+    ]

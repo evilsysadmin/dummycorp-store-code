@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import axios from 'axios';
 
 function App() {
   const [productos, setProductos] = useState([]);
@@ -7,47 +8,35 @@ function App() {
     const savedCart = localStorage.getItem('carrito');
     return savedCart ? JSON.parse(savedCart) : [];
   });
-
   const [verCarrito, setVerCarrito] = useState(false);
   const [mensajePopup, setMensajePopup] = useState('');
+  const [busqueda, setBusqueda] = useState('');
 
   useEffect(() => {
-    setProductos([
-      {
-        id: 1,
-        nombre: 'LART de BOFH',
-        descripcion: 'Ideal para dar por saco al sistema. Solo para administradores con sentido del humor.',
-        precio: 9.99,
-        imagen: '/lart-image.jpg',
-      },
-      {
-        id: 2,
-        nombre: 'Polos de segunda mano',
-        descripcion: 'Ligeramente usados, pero con una historia increíble. La mejor inversión si quieres tener estilo y misterio.',
-        precio: 3999.00,
-        imagen: '/vw-polo-image.jpg',
-      },
-      {
-        id: 3,
-        nombre: 'Gepeto (IA)',
-        descripcion: 'IA humorística que te hace chistes malos a cambio de tu dignidad.',
-        precio: 19900.99,
-        imagen: '/gepeto-image.jpg',
-      },
-      {
-        id: 4,
-        nombre: 'Manual de Excusas para Desarrolladores',
-        descripcion: 'Contiene 101 formas de decir "En mi máquina funciona". Bestseller entre programadores. MUHAHA.',
-        precio: 15.99,
-        imagen: '/dev-excuses.jpg',
-      },
-    ]);
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000/api'; // Fallback para desarrollo local
+    axios.get(`${apiUrl}/productos`)
+      .then((response) => {
+        const productosConId = response.data.map((producto) => ({
+          id: producto._id,
+          nombre: producto.name,       // Cambiar a 'name' para coincidir con los datos del backend
+          descripcion: producto.description, // Cambiar a 'description'
+          precio: parseFloat(producto.price), // Cambiar a 'price'
+          imagen: producto.imagen ? `/images/${producto.imagen}` : '/images/lart-image.jpg',
+        }));
+        setProductos(productosConId);
+      })
+      .catch((error) => {
+        console.error('Error al cargar los productos:', error);
+      });
   }, []);
+
+  const productosFiltrados = productos.filter((producto) =>
+    producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   const agregarAlCarrito = (producto) => {
     setCarrito((prevCarrito) => {
       const productoExistente = prevCarrito.find(item => item.id === producto.id);
-
       if (productoExistente) {
         return prevCarrito.map(item => 
           item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
@@ -57,10 +46,8 @@ function App() {
         return nuevoCarrito;
       }
     });
-
-    // Mostrar el popup de producto añadido
     setMensajePopup(`¡${producto.nombre} añadido al carrito!`);
-    setTimeout(() => setMensajePopup(''), 3000);  // Eliminar mensaje después de 3 segundos
+    setTimeout(() => setMensajePopup(''), 3000);
   };
 
   const eliminarDelCarrito = (id) => {
@@ -77,8 +64,8 @@ function App() {
   };
 
   const vaciarCarrito = () => {
-    setCarrito([]); // Vaciamos el carrito en el estado
-    localStorage.removeItem('carrito'); // Eliminamos el carrito del localStorage
+    setCarrito([]);
+    localStorage.removeItem('carrito');
   };
 
   const calcularCarrito = () => {
@@ -92,7 +79,10 @@ function App() {
   const mostrarCarrito = () => {
     return carrito.map((producto) => (
       <div key={producto.id} className="producto-carrito">
-        <div>
+        <div className="producto-thumbnail">
+          <img src={producto.imagen} alt={producto.nombre} />
+        </div>
+        <div className="producto-info">
           <h3>{producto.nombre}</h3>
           <p>Cantidad: {producto.cantidad}</p>
           <p>€{(producto.precio * producto.cantidad).toFixed(2)}</p>
@@ -125,36 +115,50 @@ function App() {
           <span className="total-carrito">€{calcularTotal()}</span>
         </div>
       </header>
-
-      {/* Mostrar mensaje pop-up */}
       {mensajePopup && <div className="popup">{mensajePopup}</div>}
-
       {verCarrito && (
-        <div className="carrito-modal">
-          <h2>Tu Carrito</h2>
-          {carrito.length > 0 ? (
-            <div className="productos-carrito">
-              {mostrarCarrito()}
-              <h3>Total: €{calcularTotal()}</h3>
-              <button onClick={vaciarCarrito}>Vaciar Carrito</button>
-            </div>
-          ) : (
-            <p>No hay productos en el carrito.</p>
-          )}
-          <button onClick={() => setVerCarrito(false)}>Cerrar</button>
-        </div>
-      )}
-
-      <div className="productos">
-        {productos.map((producto) => (
-          <div key={producto.id} className="producto">
-            <img src={producto.imagen} alt={producto.nombre} />
-            <h2>{producto.nombre}</h2>
-            <p>{producto.descripcion}</p>
-            <p><strong>Precio: €{producto.precio.toFixed(2)}</strong></p>
-            <button onClick={() => agregarAlCarrito(producto)}>Añadir al carrito</button>
+        <>
+          <div className="carrito-modal-overlay" onClick={() => setVerCarrito(false)}></div>
+          <div className="carrito-modal">
+            <h2>
+              Tu Carrito
+              <span style={{ cursor: 'pointer' }} onClick={() => setVerCarrito(false)}>✕</span>
+            </h2>
+            {carrito.length > 0 ? (
+              <div className="productos-carrito">
+                {mostrarCarrito()}
+                <h3>Total: €{calcularTotal()}</h3>
+                <button onClick={vaciarCarrito}>Vaciar Carrito</button>
+              </div>
+            ) : (
+              <p>No hay productos en el carrito.</p>
+            )}
+            <button onClick={() => setVerCarrito(false)}>Cerrar</button>
           </div>
-        ))}
+        </>
+      )}
+      <div className="busqueda">
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)} 
+        />
+      </div>
+      <div className="productos">
+        {productosFiltrados.length > 0 ? (
+          productosFiltrados.map((producto) => (
+            <div key={producto.id} className="producto">
+              <img src={producto.imagen} alt={producto.nombre} />
+              <h2>{producto.nombre}</h2>
+              <p>{producto.descripcion}</p>
+              <p><strong>Precio: €{producto.precio.toFixed(2)}</strong></p>
+              <button onClick={() => agregarAlCarrito(producto)}>Añadir al carrito</button>
+            </div>
+          ))
+        ) : (
+          <p>No se han encontrado productos.</p>
+        )}
       </div>
     </div>
   );

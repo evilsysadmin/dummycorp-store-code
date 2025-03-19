@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-init
+  namespace: dummycorp-store
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-mongodb
+          image: mongo:6.0
+          command:
+            - "bash"
+            - "-c"
+            - |
+              for i in {1..30}; do
+                if mongosh --host mongodb --port 27017 -u admin -p password --eval "db.runCommand({ ping: 1 })"; then
+                  echo "MongoDB está listo!"
+                  exit 0
+                fi
+                echo "Esperando a que MongoDB esté listo... (intento $i/30)"
+                sleep 10
+              done
+              echo "Error: MongoDB no estuvo listo después de 5 minutos"
+              exit 1
+      containers:
+        - name: mongodb-init
+          image: mongo:6.0
+          command:
+            - "bash"
+            - "-c"
+            - |
+              for i in {1..5}; do
+                if mongoimport --host mongodb --port 27017 --username admin --password password --authenticationDatabase admin --db mydb --collection products --drop --jsonArray < /fixtures/products.json; then
+                  echo "Importación completada con éxito!"
+                  exit 0
+                fi
+                echo "Fallo al importar, reintentando... (intento $i/5)"
+                sleep 5
+              done
+              echo "Error: No se pudo importar después de 5 intentos"
+              exit 1
+          volumeMounts:
+            - name: fixtures
+              mountPath: /fixtures
+      volumes:
+        - name: fixtures
+          configMap:
+            name: mongodb-fixtures
+  backoffLimit: 4

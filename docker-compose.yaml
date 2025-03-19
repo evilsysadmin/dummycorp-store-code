@@ -17,7 +17,8 @@ services:
     build:
       context: ./backend
     environment:
-      - MONGO_URI=mongodb://mongo:27017/dummycorp
+      - MONGO_URI=mongodb://mongo:27017/dummycorp  # URI de conexión a MongoDB
+      - NODE_ENV=development  # Puedes configurar NODE_ENV si estás en desarrollo
     ports:
       - "3000:3000"  # El backend estará accesible en localhost:3000
     depends_on:
@@ -32,14 +33,14 @@ services:
     ports:
       - "27017:27017"  # MongoDB estará disponible en localhost:27017
     volumes:
-      - mongo_data:/data/db
+      - mongo_data:/data/db  # Volumen para persistir los datos de MongoDB
     networks:
       - app-network
+
+volumes:
+  mongo_data:
+    driver: local  # Usamos un volumen local para MongoDB
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  mongo_data:
-    driver: local

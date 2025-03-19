@@ -1,25 +1,27 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const productosRouter = require('../routes/productos'); // Importa las rutas
+
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
-// Conexión a la base de datos MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb://mongo:27017/dummycorp', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('MongoDB conectado'))
-  .catch(err => console.error('Error de conexión:', err));
+// Obtener la URI de MongoDB desde las variables de entorno
+const mongoUri = process.env.MONGO_URI || 'mongodb://mongo:27017/dummycorp';
 
-// Middleware para analizar JSON
+mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log(`Conectado a MongoDB en ${mongoUri}`))
+  .catch(err => console.error('Error de conexión a MongoDB:', err));
+
+// Usar CORS
+app.use(cors());
+
+// Usar el body-parser para manejar datos JSON
 app.use(express.json());
 
-// Ruta de prueba
-app.get('/', (req, res) => {
-  res.send('¡Backend funcionando!');
-});
+// Registrar la ruta de productos
+app.use('/api', productosRouter);
 
-// Iniciar el servidor
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+app.listen(port, () => {
+  console.log(`Servidor backend corriendo en http://localhost:${port}`);
 });
